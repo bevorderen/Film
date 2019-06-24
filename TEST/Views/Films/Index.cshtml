@@ -1,0 +1,55 @@
+﻿@model IEnumerable<TEST.Models.Film>
+
+@{
+    ViewBag.Title = "Index";
+    var myFilms = Model.OrderByDescending(i => i.Created_post).ToList();
+
+    var contFilm = 6;
+}
+
+<h2>Главная страница</h2>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <p>
+        @Html.ActionLink("Добавить фильм", "Create")
+    </p>
+}
+<div class="mt-3 col-12">
+    <div class="card-page col-12">
+        <div class="row">
+            @for (int i = ViewBag.currentPage * contFilm; i < ViewBag.currentPage * contFilm + contFilm; i++)
+            {
+                if (i < myFilms.Count && i >= 0)
+                {
+                    var item = myFilms[i];
+                    <div class="card mb-2" style="width: 19rem;">
+                        <img src="@item.Path" class="card-img-top" alt="Постер">
+                        <div class="card-body">
+                            <h5> @Html.ActionLink(item.Name, "Details", "Films", new { id = item.Id }, new { })</h5>
+                            <h5 class="card-title">Описание</h5>
+                            <p class="card-text">@item.Description</p>
+                            <h5 class="card-title">Режисёр</h5>
+                            <p class="card-text">@item.Regisseur</p>
+                            <h5 class="card-title">Премьера</h5>
+                            <p class="card-text">@item.Created.ToShortDateString()</p>
+                            @if (User.Identity.Name == item.CreatorName)
+                            {
+                                @Html.ActionLink("Редактировать", "Edit", "Films", new { id = item.Id }, new { @class = "btn btn-primary" })
+                            }
+                            <p class="card-text"><small class="text-muted">Создатель - @item.CreatorName</small></p>
+                        </div>
+                    </div>
+                }
+            }
+            <div class="col-12 text-right">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-between" style="margin-left: -15px">
+                        @Html.ActionLink("Предыдущая страница", "Index", "Films", new { currentPage = ViewBag.currentPage - 1 }, new { @class = "btn btn-primary" })
+                        @Html.ActionLink("Следующая страница", "Index", "Films", new { currentPage = ViewBag.currentPage + 1 }, new { @class = "btn btn-primary" })
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

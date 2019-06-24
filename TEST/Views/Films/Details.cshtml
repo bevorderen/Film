@@ -1,0 +1,60 @@
+﻿@model TEST.Models.Film
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Film</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dd>
+            <img src="@Model.Path" alt="Image" />
+        </dd>
+
+        <dt>
+            @Html.LabelFor(model => model.Name, "Название фильма")
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.LabelFor(model => model.Description, "Описание")
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.LabelFor(model => model.Created, "Премьера")
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Created)
+        </dd>
+
+        <dt>
+            @Html.LabelFor(model => model.Regisseur, "Режисёр")
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Regisseur)
+        </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Редактировать", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Назад", "Index")
+
+    @if (User.Identity.Name == Model.CreatorName)
+    {
+        <text>|
+            @Html.ActionLink("Удалить", "Delete", "Films",new { id=Model.Id},new { })
+        </text>
+    }
+</p>
