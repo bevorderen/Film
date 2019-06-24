@@ -58,18 +58,18 @@ namespace TEST.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(FilmEditModel model)
         {
-            Guid file_name;
+            Guid file_name = Guid.NewGuid();
             var fileName = "";
+            var fileExt = "";
             if (model.File != null)
             {
                 fileName = System.IO.Path.GetFileName(model.File.FileName);
-                file_name = new Guid();
-                var fileExt = Path.GetExtension(fileName).ToLower();
+                fileExt = Path.GetExtension(fileName).ToLower();
                 if (!FilmsController.AllowedExtensions.Contains(fileExt))
                 {
                     this.ModelState.AddModelError(nameof(model.File), "This file type is prohibited");
                 }
-                model.File.SaveAs(HostingEnvironment.MapPath("~/attachments/" + file_name));
+                model.File.SaveAs(HostingEnvironment.MapPath("~/attachments/" + file_name+ fileExt));
             }
 
             if (ModelState.IsValid)
@@ -85,7 +85,7 @@ namespace TEST.Controllers
                     Created_post = DateTime.Now
                 };
                 if (model.File != null)
-                    Film.Path = "/attachments/" + fileName;
+                    Film.Path = "/attachments/" + file_name + fileExt;
 
                 db.Films.Add(Film);
                 db.SaveChanges();
@@ -126,10 +126,11 @@ namespace TEST.Controllers
         public async Task<ActionResult> Edit(Guid id, FilmEditModel model)
         {
             var film = await this.db.Films.SingleOrDefaultAsync(m => m.Id == id);
+            var fileExt = "";
             if (model.File != null)
             {
                 var fileName = System.IO.Path.GetFileName(model.File.FileName);
-                var fileExt = Path.GetExtension(fileName).ToLower();
+                fileExt = Path.GetExtension(fileName).ToLower();
                 if (!FilmsController.AllowedExtensions.Contains(fileExt))
                 {
                     this.ModelState.AddModelError(nameof(model.File), "This file type is prohibited");
@@ -143,9 +144,9 @@ namespace TEST.Controllers
                 film.Created = model.Created;
                 if (model.File != null)
                 {
-                    Guid file_name = new Guid();
-                    model.File.SaveAs(HostingEnvironment.MapPath("~/attachments/" + file_name));
-                    film.Path = "/attachments/" + file_name;
+                    Guid file_name = Guid.NewGuid();
+                    model.File.SaveAs(HostingEnvironment.MapPath("~/attachments/" + file_name+ fileExt));
+                    film.Path = "/attachments/" + file_name + fileExt;
                 }
                 db.SaveChanges();
                 return RedirectToAction("Index");
