@@ -58,16 +58,18 @@ namespace TEST.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(FilmEditModel model)
         {
+            Guid file_name;
             var fileName = "";
             if (model.File != null)
             {
                 fileName = System.IO.Path.GetFileName(model.File.FileName);
+                file_name = new Guid();
                 var fileExt = Path.GetExtension(fileName).ToLower();
                 if (!FilmsController.AllowedExtensions.Contains(fileExt))
                 {
                     this.ModelState.AddModelError(nameof(model.File), "This file type is prohibited");
                 }
-                model.File.SaveAs(HostingEnvironment.MapPath("~/attachments/" + fileName));
+                model.File.SaveAs(HostingEnvironment.MapPath("~/attachments/" + file_name));
             }
 
             if (ModelState.IsValid)
@@ -123,19 +125,27 @@ namespace TEST.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(Guid id, FilmEditModel model)
         {
+            var film = await this.db.Films.SingleOrDefaultAsync(m => m.Id == id);
+            if (model.File != null)
+            {
+                var fileName = System.IO.Path.GetFileName(model.File.FileName);
+                var fileExt = Path.GetExtension(fileName).ToLower();
+                if (!FilmsController.AllowedExtensions.Contains(fileExt))
+                {
+                    this.ModelState.AddModelError(nameof(model.File), "This file type is prohibited");
+                }
+            }
             if (ModelState.IsValid)
             {
-                
-                var film = await this.db.Films.SingleOrDefaultAsync(m => m.Id == id);
                 film.Name = model.Name;
                 film.Regisseur = model.Regisseur;
                 film.Description = model.Description;
                 film.Created = model.Created;
                 if (model.File != null)
                 {
-                    var fileName = System.IO.Path.GetFileName(model.File.FileName);
-                    model.File.SaveAs(HostingEnvironment.MapPath("~/attachments/" + fileName));
-                    film.Path = "/attachments/" + fileName;
+                    Guid file_name = new Guid();
+                    model.File.SaveAs(HostingEnvironment.MapPath("~/attachments/" + file_name));
+                    film.Path = "/attachments/" + file_name;
                 }
                 db.SaveChanges();
                 return RedirectToAction("Index");
